@@ -112,6 +112,8 @@ Without this line, scheduled posts will never be published automatically; you wo
 - **Disk penyimpanan:** set `MEDIA_DISK=public` (default, `storage/app/public` + symlink `public/storage`) atau `MEDIA_DISK=s3` setelah mengisi `AWS_*` di `.env` dan memastikan bucket serta IAM sudah benar.
 - **CDN / URL publik:** untuk disk `public`, set `MEDIA_URL` ke basis URL aset Anda (mis. `https://cdn.example.com/storage`) agar `Storage::url()` mengarah ke CDN. Untuk S3, gunakan `AWS_URL` (mis. CloudFront) sesuai [dokumentasi Laravel filesystem](https://laravel.com/docs/filesystem).
 
+**Full guide:** [Media storage, variants & CDN](https://nebula.angkasalabs.com/docs/media) on the documentation site.
+
 ## 🤝 Contribute
 
 We greatly appreciate contributions from the community! NebulaCMS is an open-source project, and we welcome contributions in various forms:
