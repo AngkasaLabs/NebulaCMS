@@ -1,0 +1,39 @@
+{
+    "name": "Classic One",
+    "slug": "classic-one",
+    "version": "1.0.0",
+    "description": "Classic blog theme with 2010s era look",
+    "author": "NebulaCMS",
+    "preview": "assets/images/preview.png",
+    "requires": {
+        "cms_version": "^1.0.0"
+    },
+    "settings": {
+        "colors": {
+            "primary": "#0066cc",
+            "secondary": "#333333",
+            "success": "#5cb85c",
+            "info": "#5bc0de",
+            "warning": "#f0ad4e",
+            "danger": "#d9534f",
+            "light": "#f8f9fa",
+            "dark": "#333333",
+            "background": "#f5f5f5",
+            "header": "#333333",
+            "footer": "#222222",
+            "sidebar": "#ffffff",
+            "border": "#dddddd"
+        },
+        "typography": {
+            "primary_font": "Georgia, serif",
+            "secondary_font": "Arial, sans-serif",
+            "heading_font": "Georgia, serif",
+            "body_font": "Arial, sans-serif"
+        },
+        "layout": {
+            "container_width": "1000px",
+            "sidebar_position": "right",
+            "sidebar_width": "300px"
+        }
+    }
+}

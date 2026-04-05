@@ -1,0 +1,6 @@
+# Snippet for Nginx: deny executing scripts under the storage symlink (adjust path to your public root).
+# Include inside `location ^~ /storage/` or equivalent.
+#
+# location ~* ^/storage/.*\.(php|phtml|phar|pl|py|cgi|jsp|asp|sh)$ {
+#     deny all;
+# }

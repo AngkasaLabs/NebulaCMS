@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Http\Requests\User;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
+
+class UpdateUserRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return $this->user()->can('edit users');
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($this->user)],
+            'password' => ['nullable', 'confirmed', Password::defaults()],
+            'roles' => ['required', 'array'],
+            'roles.*' => ['exists:roles,name'],
+            'bio' => ['nullable', 'string'],
+            'avatar' => ['nullable', 'image', 'max:2048'], // Max 2MB
+            'facebook_url' => ['nullable', 'url'],
+            'twitter_url' => ['nullable', 'url'],
+            'instagram_url' => ['nullable', 'url'],
+            'linkedin_url' => ['nullable', 'url'],
+        ];
+    }
+}

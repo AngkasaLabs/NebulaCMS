@@ -1,0 +1,31 @@
+{
+    "name": "Default Theme",
+    "slug": "default",
+    "version": "1.0.0",
+    "description": "Tema default NebulaCMS menggunakan Bootstrap 5",
+    "author": "NebulaCMS",
+    "preview": "assets/images/preview.png",
+    "requires": {
+        "cms_version": "^1.0.0"
+    },
+    "settings": {
+        "colors": {
+            "primary": "#0d6efd",
+            "secondary": "#6c757d",
+            "success": "#198754",
+            "info": "#0dcaf0",
+            "warning": "#ffc107",
+            "danger": "#dc3545",
+            "light": "#f8f9fa",
+            "dark": "#212529"
+        },
+        "typography": {
+            "primary_font": "system-ui",
+            "secondary_font": "Arial"
+        },
+        "layout": {
+            "container_width": "1320px",
+            "sidebar_position": "right"
+        }
+    }
+}

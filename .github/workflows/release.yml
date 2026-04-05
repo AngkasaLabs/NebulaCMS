@@ -1,0 +1,74 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          extensions: mbstring, xml, ctype, json, bcmath, curl, gd, fileinfo
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install PHP Dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Extract Version
+        id: version
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - name: Create Release Archive
+        run: |
+          zip -r nebulacms-${{ steps.version.outputs.tag }}.zip . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "node_modules/*" \
+            -x "tests/*" \
+            -x ".env" \
+            -x "*.lock" \
+            -x "storage/logs/*" \
+            -x "storage/framework/cache/data/*" \
+            -x "storage/framework/sessions/*" \
+            -x "storage/framework/views/*" \
+            -x "storage/app/public/*" \
+            -x "phpunit.xml" \
+            -x "vite.config.ts" \
+            -x "tsconfig*.json" \
+            -x "eslint.config.js" \
+            -x "postcss.config.js" \
+            -x "tailwind.config.*" \
+            -x ".prettierrc" \
+            -x ".editorconfig"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: nebulacms-${{ steps.version.outputs.tag }}.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') || contains(github.ref, '-rc') }}
