@@ -10,8 +10,7 @@ return [
     | The current version of NebulaCMS. This is used by the self-updater
     | to compare against the latest GitHub release.
     |
-    */
-    'version' => '1.2.0',
+    'version' => '1.3.0',
 
     /*
     |--------------------------------------------------------------------------
