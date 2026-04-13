@@ -42,14 +42,30 @@ it('fires theme.before_activate and theme.after_activate when activating a theme
         $afterActive = $theme->is_active;
     });
 
-    $this->actingAs($user)
-        ->post(route('admin.themes.activate', $next))
-        ->assertRedirect();
+    $themePath = base_path('themes/next-theme');
+    if (!File::exists($themePath)) {
+        File::makeDirectory($themePath, 0755, true);
+    }
+    File::put($themePath . '/theme.json', json_encode([
+        'name' => 'Next Theme',
+        'slug' => 'next-theme',
+        'version' => '1.0.0'
+    ]));
 
-    expect($beforeId)->toBe($next->id);
-    expect($afterActive)->toBeTrue();
-    expect($next->fresh()->is_active)->toBeTrue();
-    expect($previousActive->fresh()->is_active)->toBeFalse();
+    try {
+        $this->actingAs($user)
+            ->post(route('admin.themes.activate', $next))
+            ->assertRedirect();
+
+        expect($beforeId)->toBe($next->id);
+        expect($afterActive)->toBeTrue();
+        expect($next->fresh()->is_active)->toBeTrue();
+        expect($previousActive->fresh()->is_active)->toBeFalse();
+    } finally {
+        if (File::exists($themePath)) {
+            File::deleteDirectory($themePath);
+        }
+    }
 });
 
 it('fires theme.before_delete and theme.after_delete when deleting an inactive theme', function () {
@@ -78,9 +94,25 @@ it('fires theme.before_delete and theme.after_delete when deleting an inactive t
         $afterSnapshot = $snapshot;
     });
 
-    $this->actingAs($user)
-        ->delete(route('admin.themes.destroy', $toDelete))
-        ->assertRedirect();
+    $themePath = base_path('themes/trash-theme');
+    if (!File::exists($themePath)) {
+        File::makeDirectory($themePath, 0755, true);
+    }
+    File::put($themePath . '/theme.json', json_encode([
+        'name' => 'Trash Theme',
+        'slug' => 'trash-theme',
+        'version' => '1.0.0'
+    ]));
+
+    try {
+        $this->actingAs($user)
+            ->delete(route('admin.themes.destroy', $toDelete))
+            ->assertRedirect();
+    } finally {
+        if (File::exists($themePath)) {
+            File::deleteDirectory($themePath);
+        }
+    }
 
     expect($beforeFolder)->toBe('trash-theme');
     expect($afterSnapshot)->toMatchArray([
