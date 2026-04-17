@@ -27,5 +27,75 @@
             "container_width": "1320px",
             "sidebar_position": "right"
         }
+    },
+    "settings_schema": {
+        "fields": [
+            {
+                "key": "colors.primary",
+                "type": "color",
+                "label": "Primary Color",
+                "description": "Main theme color"
+            },
+            {
+                "key": "colors.secondary",
+                "type": "color",
+                "label": "Secondary Color",
+                "description": "Secondary theme color"
+            },
+            {
+                "key": "colors.success",
+                "type": "color",
+                "label": "Success Color"
+            },
+            {
+                "key": "colors.info",
+                "type": "color",
+                "label": "Info Color"
+            },
+            {
+                "key": "colors.warning",
+                "type": "color",
+                "label": "Warning Color"
+            },
+            {
+                "key": "colors.danger",
+                "type": "color",
+                "label": "Danger Color"
+            },
+            {
+                "key": "colors.light",
+                "type": "color",
+                "label": "Light Color"
+            },
+            {
+                "key": "colors.dark",
+                "type": "color",
+                "label": "Dark Color"
+            },
+            {
+                "key": "typography.primary_font",
+                "type": "text",
+                "label": "Primary Font",
+                "description": "Font family for headings and primary text"
+            },
+            {
+                "key": "typography.secondary_font",
+                "type": "text",
+                "label": "Secondary Font",
+                "description": "Font family for body text"
+            },
+            {
+                "key": "layout.container_width",
+                "type": "text",
+                "label": "Container Width",
+                "description": "Max width for content container (e.g., 1320px)"
+            },
+            {
+                "key": "layout.sidebar_position",
+                "type": "text",
+                "label": "Sidebar Position",
+                "description": "Sidebar position: left or right"
+            }
+        ]
     }
 }

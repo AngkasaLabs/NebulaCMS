@@ -11,6 +11,7 @@ use App\Support\ThemeHooks;
 use App\Services\SecureZipInspector;
 use App\Support\InertiaUploadSecurity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 use ZipArchive;
@@ -67,7 +68,7 @@ class ThemeController extends Controller
             return redirect()->back()->with('error', implode(' ', $check['errors']));
         }
 
-        do_action('theme.before_activate', $theme);
+        do_action(ThemeHooks::THEME_BEFORE_ACTIVATE, $theme);
 
         $theme->activate();
         $fresh = $theme->fresh();
@@ -79,7 +80,7 @@ class ThemeController extends Controller
                 ->log('theme_activated');
         }
 
-        do_action('theme.after_activate', $fresh);
+        do_action(ThemeHooks::THEME_AFTER_ACTIVATE, $fresh);
 
         $this->publishAssets($fresh);
 
@@ -89,6 +90,31 @@ class ThemeController extends Controller
         }
 
         return redirect()->back()->with('success', $msg);
+    }
+
+    public function deactivate(Theme $theme)
+    {
+        if (! $theme->is_active) {
+            return redirect()->back()->with('error', 'Theme is already inactive.');
+        }
+
+        do_action(ThemeHooks::THEME_BEFORE_DEACTIVATE, $theme);
+
+        $theme->is_active = false;
+        $theme->save();
+
+        $fresh = $theme->fresh();
+
+        if (function_exists('activity') && auth()->check()) {
+            activity()
+                ->causedBy(auth()->user())
+                ->withProperties(['theme_id' => $fresh->id, 'slug' => $fresh->slug])
+                ->log('theme_deactivated');
+        }
+
+        do_action(ThemeHooks::THEME_AFTER_DEACTIVATE, $fresh);
+
+        return redirect()->back()->with('success', 'Theme deactivated successfully');
     }
 
     public function scan()
@@ -163,7 +189,7 @@ class ThemeController extends Controller
             try {
                 putenv('NEBULA_THEME_UNINSTALL=1');
                 require $uninstall;
-                putenv('NEBULA_THEME_UNINSTALL');
+                putenv('NEBULA_THEME_UNINSTALL=');
             } catch (\Throwable $e) {
                 \Log::error('Theme uninstall script failed: '.$e->getMessage());
 
@@ -171,7 +197,7 @@ class ThemeController extends Controller
             }
         }
 
-        do_action('theme.before_delete', $theme);
+        do_action(ThemeHooks::THEME_BEFORE_DELETE, $theme);
 
         $snapshot = [
             'id' => $theme->id,
@@ -195,7 +221,7 @@ class ThemeController extends Controller
         // Hapus dari database
         $theme->delete();
 
-        do_action('theme.after_delete', $snapshot);
+        do_action(ThemeHooks::THEME_AFTER_DELETE, $snapshot);
 
         if (function_exists('activity') && auth()->check()) {
             activity()
@@ -329,6 +355,7 @@ class ThemeController extends Controller
             $rules[$key] = match ($type) {
                 'boolean', 'bool' => ['nullable', 'boolean'],
                 'number', 'integer', 'int' => ['nullable', 'numeric'],
+                'color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
                 default => ['nullable', 'string', 'max:65535'],
             };
         }
@@ -338,7 +365,30 @@ class ThemeController extends Controller
         }
 
         $validated = $request->validate($rules);
-        $merged = array_merge($theme->settings ?? [], $validated);
+
+        // Merge nested settings using dot notation
+        $merged = $theme->settings ?? [];
+        foreach ($validated as $key => $value) {
+            if (str_contains($key, '.')) {
+                // Handle nested keys like "colors.primary"
+                $keys = explode('.', $key);
+                $current = &$merged;
+                foreach ($keys as $i => $k) {
+                    if ($i === count($keys) - 1) {
+                        $current[$k] = $value;
+                    } else {
+                        if (! isset($current[$k]) || ! is_array($current[$k])) {
+                            $current[$k] = [];
+                        }
+                        $current = &$current[$k];
+                    }
+                }
+                unset($current);
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+
         $theme->update(['settings' => $merged]);
 
         return redirect()->back()->with('success', 'Theme settings saved.');
@@ -349,15 +399,23 @@ class ThemeController extends Controller
      */
     private function publishAssets(Theme $theme): void
     {
-        $source = base_path("themes/{$theme->folder_name}/assets");
-        $target = public_path("themes/{$theme->folder_name}/assets");
+        $lockKey = "theme_assets_{$theme->folder_name}";
 
-        if (File::exists($source)) {
-            if (File::exists($target)) {
-                File::deleteDirectory($target);
-            }
+        try {
+            Cache::lock($lockKey, 30)->get(function () use ($theme) {
+                $source = base_path("themes/{$theme->folder_name}/assets");
+                $target = public_path("themes/{$theme->folder_name}/assets");
 
-            File::copyDirectory($source, $target);
+                if (File::exists($source)) {
+                    if (File::exists($target)) {
+                        File::deleteDirectory($target);
+                    }
+
+                    File::copyDirectory($source, $target);
+                }
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            \Log::error("Failed to acquire lock for theme assets: {$e->getMessage()}");
         }
     }
 }

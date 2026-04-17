@@ -88,12 +88,4 @@ final class PluginHooks
     public const THEME_PUBLIC_ASSETS_PATH = 'theme.public_assets_path';
 
     public const THEME_CONTENT = 'theme.content';
-
-    public const THEME_BEFORE_ACTIVATE = 'theme.before_activate';
-
-    public const THEME_AFTER_ACTIVATE = 'theme.after_activate';
-
-    public const THEME_BEFORE_DELETE = 'theme.before_delete';
-
-    public const THEME_AFTER_DELETE = 'theme.after_delete';
 }

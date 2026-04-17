@@ -35,5 +35,111 @@
             "sidebar_position": "right",
             "sidebar_width": "300px"
         }
+    },
+    "settings_schema": {
+        "fields": [
+            {
+                "key": "colors.primary",
+                "type": "color",
+                "label": "Primary Color",
+                "description": "Main theme color"
+            },
+            {
+                "key": "colors.secondary",
+                "type": "color",
+                "label": "Secondary Color"
+            },
+            {
+                "key": "colors.success",
+                "type": "color",
+                "label": "Success Color"
+            },
+            {
+                "key": "colors.info",
+                "type": "color",
+                "label": "Info Color"
+            },
+            {
+                "key": "colors.warning",
+                "type": "color",
+                "label": "Warning Color"
+            },
+            {
+                "key": "colors.danger",
+                "type": "color",
+                "label": "Danger Color"
+            },
+            {
+                "key": "colors.light",
+                "type": "color",
+                "label": "Light Color"
+            },
+            {
+                "key": "colors.dark",
+                "type": "color",
+                "label": "Dark Color"
+            },
+            {
+                "key": "colors.background",
+                "type": "color",
+                "label": "Background Color"
+            },
+            {
+                "key": "colors.header",
+                "type": "color",
+                "label": "Header Color"
+            },
+            {
+                "key": "colors.footer",
+                "type": "color",
+                "label": "Footer Color"
+            },
+            {
+                "key": "colors.sidebar",
+                "type": "color",
+                "label": "Sidebar Color"
+            },
+            {
+                "key": "colors.border",
+                "type": "color",
+                "label": "Border Color"
+            },
+            {
+                "key": "typography.primary_font",
+                "type": "text",
+                "label": "Primary Font"
+            },
+            {
+                "key": "typography.secondary_font",
+                "type": "text",
+                "label": "Secondary Font"
+            },
+            {
+                "key": "typography.heading_font",
+                "type": "text",
+                "label": "Heading Font"
+            },
+            {
+                "key": "typography.body_font",
+                "type": "text",
+                "label": "Body Font"
+            },
+            {
+                "key": "layout.container_width",
+                "type": "text",
+                "label": "Container Width"
+            },
+            {
+                "key": "layout.sidebar_position",
+                "type": "text",
+                "label": "Sidebar Position",
+                "description": "left or right"
+            },
+            {
+                "key": "layout.sidebar_width",
+                "type": "text",
+                "label": "Sidebar Width"
+            }
+        ]
     }
 }

@@ -119,6 +119,7 @@ class PluginController extends Controller
             $rules[$key] = match ($type) {
                 'boolean', 'bool' => ['nullable', 'boolean'],
                 'number', 'integer', 'int' => ['nullable', 'numeric'],
+                'color' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
                 default => ['nullable', 'string', 'max:65535'],
             };
         }
@@ -128,7 +129,30 @@ class PluginController extends Controller
         }
 
         $validated = $request->validate($rules);
-        $merged = array_merge($plugin->settings ?? [], $validated);
+
+        // Merge nested settings using dot notation
+        $merged = $plugin->settings ?? [];
+        foreach ($validated as $key => $value) {
+            if (str_contains($key, '.')) {
+                // Handle nested keys like "colors.primary"
+                $keys = explode('.', $key);
+                $current = &$merged;
+                foreach ($keys as $i => $k) {
+                    if ($i === count($keys) - 1) {
+                        $current[$k] = $value;
+                    } else {
+                        if (! isset($current[$k]) || ! is_array($current[$k])) {
+                            $current[$k] = [];
+                        }
+                        $current = &$current[$k];
+                    }
+                }
+                unset($current);
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+
         $plugin->update(['settings' => $merged]);
 
         return redirect()->back()->with('success', 'Plugin settings saved.');
@@ -205,7 +229,7 @@ class PluginController extends Controller
             try {
                 putenv('NEBULA_PLUGIN_UNINSTALL=1');
                 require $uninstall;
-                putenv('NEBULA_PLUGIN_UNINSTALL');
+                putenv('NEBULA_PLUGIN_UNINSTALL=');
             } catch (\Throwable $e) {
                 \Log::error('Plugin uninstall script failed: '.$e->getMessage());
 
